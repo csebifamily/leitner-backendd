@@ -10,22 +10,12 @@ import User from './model/User.js';
 import Word from './model/Word.js';
 import mongoose from 'mongoose';
 
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://mellow-torrone-e47c8b.netlify.app'
-];
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
+    origin: process.env.FRONTEND,
+    credentials: true
 }));
 
 async function sendResetEmail(toEmail, resetToken) {
