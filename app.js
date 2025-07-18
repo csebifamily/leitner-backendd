@@ -10,11 +10,11 @@ import User from './model/User.js';
 import Word from './model/Word.js';
 import mongoose from 'mongoose';
 
+const app = express();
 app.use((req, res, next) => {
   console.log('Origin:', req.headers.origin);
   next();
 });
-const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
