@@ -338,9 +338,10 @@ app.post('/api/new-word', verifyToken('access'), async (req, res) => {
     }
 })
 
-app.listen(9000, () => {
-    console.log('Sikeres csatlakozás!');
-})
+const PORT = process.env.PORT || 9000;
+app.listen(PORT, () => {
+    console.log(`Sikeres csatlakozás a ${PORT} porton!`);
+});
 
 
 
