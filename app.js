@@ -11,14 +11,10 @@ import Word from './model/Word.js';
 import mongoose from 'mongoose';
 
 const app = express();
-app.use((req, res, next) => {
-  console.log('Origin:', req.headers.origin);
-  next();
-});
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.FRONTEND,
+    origin: 'http://leitner.csebidev.nhely.hu/',
     credentials: true
 }));
 
@@ -31,7 +27,7 @@ async function sendResetEmail(toEmail, resetToken) {
     },
   });
 
-  const resetLink = `${process.env.FRONTEND}/reset-password/${resetToken}`;
+  const resetLink = `http://leitner.csebidev.nhely.hu/reset-password/${resetToken}`;
 
   const info = await transporter.sendMail({
     from: '"Leitner szótanuló" <csebij1996@gmail.com>',
