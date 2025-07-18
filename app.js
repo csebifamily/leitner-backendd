@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'https://csebifamily.github.io',
+    origin: 'https://leitner-frontend.netlify.app',
     credentials: true
 }));
 
@@ -27,7 +27,7 @@ async function sendResetEmail(toEmail, resetToken) {
     },
   });
 
-  const resetLink = `https://csebifamily.github.io/reset-password/${resetToken}`;
+  const resetLink = `https://leitner-frontend.netlify.app/reset-password/${resetToken}`;
 
   const info = await transporter.sendMail({
     from: '"Leitner szótanuló" <csebij1996@gmail.com>',
