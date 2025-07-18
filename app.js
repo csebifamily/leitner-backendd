@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://leitner.csebidev.nhely.hu/',
+    origin: 'http://leitner.csebidev.nhely.hu',
     credentials: true
 }));
 
