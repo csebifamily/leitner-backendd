@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-    origin: 'http://leitner.csebidev.nhely.hu',
+    origin: 'https://csebifamily.github.io/leitner-frontendd',
     credentials: true
 }));
 
@@ -27,7 +27,7 @@ async function sendResetEmail(toEmail, resetToken) {
     },
   });
 
-  const resetLink = `http://leitner.csebidev.nhely.hu/reset-password/${resetToken}`;
+  const resetLink = `https://csebifamily.github.io/leitner-frontendd/reset-password/${resetToken}`;
 
   const info = await transporter.sendMail({
     from: '"Leitner szótanuló" <csebij1996@gmail.com>',
