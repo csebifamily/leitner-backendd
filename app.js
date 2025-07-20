@@ -235,7 +235,7 @@ app.post('/api/login-user', async (req, res) => {
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
-            sameSite: 'none',
+            sameSite: 'None',
             maxAge: 1000*60*60*24*30
         });
 
