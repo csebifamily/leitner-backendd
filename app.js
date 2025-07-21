@@ -353,13 +353,12 @@ app.post('/api/jatek-szint-szavak', verifyToken('access'), async (req, res) => {
         const today = new Date();
         today.setHours(0,0,0,0);
 
-        const match = await Word.find({ userId, level: szint, nextReview: {$lte: today} });
+        const match = await Word.find({ userId, level: szint, nextReview: {$lte: today} }).lean();
         if(match.length === 0) return res.status(404).json({ error: 'A mai nap nincs olyan szó, amit gyakorolhatnál!' });
 
-        const szavak = match.lean();
-        for (let i = szavak.length - 1; i > 0; i--) {
+        for (let i = match.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [szavak[i], szavak[j]] = [szavak[j], szavak[i]];
+            [match[i], match[j]] = [match[j], match[i]];
         }
         res.status(200).json({ szavak, szint });
     } catch (error) {
