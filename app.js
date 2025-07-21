@@ -356,7 +356,12 @@ app.post('/api/jatek-szint-szavak', verifyToken('access'), async (req, res) => {
         const match = await Word.find({ userId, level: szint, nextReview: {$lte: today} });
         if(match.length === 0) return res.status(404).json({ error: 'A mai nap nincs olyan szó, amit gyakorolhatnál!' });
 
-        res.status(200).json({ szavak: match, szint });
+        const szavak = match.lean();
+        for (let i = szavak.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [szavak[i], szavak[j]] = [szavak[j], szavak[i]];
+        }
+        res.status(200).json({ szavak, szint });
     } catch (error) {
         res.status(500).json({ error: 'Szerver hiba!' })
     }
@@ -445,7 +450,7 @@ function verifyToken(type) {
         const auth = req.headers['authorization'];
         token = auth && auth.split(' ')[1];
     } else if(type === 'refresh') {
-        token = req.body.refreshToken;
+        token = req.body.ref
     }
     
     if(!token) return res.status(403).json({ error: 'nincs token' });
