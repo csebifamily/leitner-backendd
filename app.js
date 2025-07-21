@@ -351,10 +351,15 @@ app.post('/api/jatek-szint-szavak', verifyToken('access'), async (req, res) => {
 
     try {
         const today = new Date();
-        today.setHours(0,0,0,0);
 
         const match = await Word.find({ userId, level: szint, nextReview: {$lte: today} }).lean();
-        if(match.length === 0) return res.status(404).json({ error: 'A mai nap nincs olyan szó, amit gyakorolhatnál!' });
+        console.log(match);
+        if(match.length === 0) {
+            const legkozelebbi = await Word.findOne({ userId, level: szint, nextReview: {$gt: today} })
+            .sort({ nextReview: 1 }).lean();
+            const datum = getRelativeDay(legkozelebbi.nextReview);
+            return res.status(404).json({ datum, error: 'A mai nap nincs olyan szó, amit gyakorolhatnál!' });
+        }
 
         for (let i = match.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
