@@ -360,7 +360,7 @@ app.post('/api/jatek-szint-szavak', verifyToken('access'), async (req, res) => {
             const j = Math.floor(Math.random() * (i + 1));
             [match[i], match[j]] = [match[j], match[i]];
         }
-        res.status(200).json({ szavak, szint });
+        res.status(200).json({ szavak: match, szint });
     } catch (error) {
         res.status(500).json({ error: 'Szerver hiba!' })
     }
