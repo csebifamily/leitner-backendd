@@ -450,7 +450,7 @@ function verifyToken(type) {
         const auth = req.headers['authorization'];
         token = auth && auth.split(' ')[1];
     } else if(type === 'refresh') {
-        token = req.body.ref
+        token = req.body.refreshToken;
     }
     
     if(!token) return res.status(403).json({ error: 'nincs token' });
