@@ -232,14 +232,17 @@ app.post('/api/login-user', async (req, res) => {
 
         const accessToken = jwt.sign({id: user._id, nickname: user.nickname}, process.env.ACCESS_SECRET, { expiresIn: '15s' });
         const refreshToken = jwt.sign({ id: user._id, nickname: user.nickname }, process.env.REFRESH_SECRET, { expiresIn: '30d' })
+        
+        /*
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'None',
             maxAge: 1000*60*60*24*30
         });
+        */
 
-        res.json({ accessToken });
+        res.json({ accessToken, refreshToken });
         
     } catch (error) {
         res.status(500).json({ error: 'Szerver hiba!' });
@@ -292,7 +295,7 @@ app.post('/api/forgot-password', async (req, res) => {
     
 })
 
-app.get('/api/get-new-access-token', verifyToken('refresh'), (req, res) => {
+app.post('/api/get-new-access-token', verifyToken('refresh'), (req, res) => {
 
     const accessToken = jwt.sign({
         id: req.user.id,
@@ -304,11 +307,13 @@ app.get('/api/get-new-access-token', verifyToken('refresh'), (req, res) => {
 })
 
 app.post('/api/logout-user', (req, res) => {
+    /*
     res.clearCookie('refreshToken', {
         httpOnly: true,
         secure: false,
         sameSite: 'strict'
     })
+    */
     res.status(200).json({ success: 'Sikeres kijelentkezés!' })
 })
 
@@ -434,14 +439,13 @@ function getRelativeDay(targetDate) {
 
 function verifyToken(type) {
     return function authToken(req, res, next) {
-
     let token;
 
     if(type === 'access') {
         const auth = req.headers['authorization'];
         token = auth && auth.split(' ')[1];
     } else if(type === 'refresh') {
-        token = req.cookies['refreshToken']
+        token = req.body.refreshToken;
     }
     
     if(!token) return res.status(403).json({ error: 'nincs token' });
