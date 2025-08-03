@@ -105,7 +105,7 @@ app.get('/api/elso-szint-gyakorlas', verifyToken('access'), async (req, res) => 
 //Játékkor a szavak ellenőrzése, hogy megfelelő volt-e a válasz
 app.post('/api/game-result-gyakorlas', verifyToken('access'), async (req, res) => {
     const { _id } = req.body;
-    const translation = req.body.translation.trim().toLowerCase();
+    const translation = normalize(req.body.translation);
 
     try {
         const word = await Word.findById({ _id });
@@ -126,7 +126,7 @@ app.post('/api/game-result-gyakorlas', verifyToken('access'), async (req, res) =
 app.post('/api/game-result-jatek', verifyToken('access'), async (req, res) => {
     const { _id } = req.body;
     const level = Number(req.body.level)
-    const translation = req.body.translation.trim().toLowerCase();
+    const translation = normalize(req.body.translation);
 
     const szintekIsmetlese = {
         1: 1,
@@ -353,7 +353,6 @@ app.post('/api/jatek-szint-szavak', verifyToken('access'), async (req, res) => {
         const today = new Date();
 
         const match = await Word.find({ userId, level: szint, nextReview: {$lte: today} }).lean();
-        console.log(match);
         if(match.length === 0) {
             const legkozelebbi = await Word.findOne({ userId, level: szint, nextReview: {$gt: today} })
             .sort({ nextReview: 1 }).lean();
@@ -373,7 +372,8 @@ app.post('/api/jatek-szint-szavak', verifyToken('access'), async (req, res) => {
 
 //szó szerkesztése
 app.put('/api/edit-word', verifyToken('access'), async (req, res) => {
-   const { _id, word, translation } = req.body;
+   const { _id, word } = req.body;
+   const translation = normalize(req.body.translation);
 
     try {
         const editedWord = await Word.findOneAndUpdate({_id}, {
@@ -394,8 +394,8 @@ app.post('/api/new-word', verifyToken('access'), async (req, res) => {
     try {
         const userId = req.user.id;
         const word = req.body.word.trim().toLowerCase();
-        const translation = req.body.translation.trim().toLowerCase();
-
+        const translation = normalize(req.body.translation);
+        
         const matchWord = await Word.findOne({ userId, word });
 
         if(matchWord) return res.status(409).json({ error: 'Ez a szó már szerepel a szótáradban!' })
@@ -465,4 +465,61 @@ function verifyToken(type) {
         next();
     })
     }
+}
+
+function normalize(text) {
+const contractions = {
+  "i'm": "i am",
+  "you're": "you are",
+  "he's": "he is",
+  "she's": "she is",
+  "it's": "it is",
+  "we're": "we are",
+  "they're": "they are",
+  "i've": "i have",
+  "you've": "you have",
+  "we've": "we have",
+  "they've": "they have",
+  "i'll": "i will",
+  "you'll": "you will",
+  "he'll": "he will",
+  "she'll": "she will",
+  "we'll": "we will",
+  "they'll": "they will",
+  "isn't": "is not",
+  "aren't": "are not",
+  "wasn't": "was not",
+  "weren't": "were not",
+  "don't": "do not",
+  "doesn't": "does not",
+  "didn't": "did not",
+  "won't": "will not",
+  "wouldn't": "would not",
+  "can't": "cannot",
+  "couldn't": "could not",
+  "shouldn't": "should not",
+  "mightn't": "might not",
+  "mustn't": "must not",
+  "let's": "let us",
+  "that's": "that is",
+  "who's": "who is",
+  "what's": "what is",
+  "here's": "here is",
+  "there's": "there is",
+  "where's": "where is",
+  "how's": "how is",
+  "could've": "could have",
+  "would've": "would have",
+  "should've": "should have",
+  "might've": "might have",
+  "must've": "must have",
+  "shan't": "shall not"
+};
+
+    const words = text.toLowerCase().trim().split(" ")
+    .filter(word => word !== "");
+
+    const expandedWords = words.map(word => contractions[word] || word);
+    return expandedWords.join(" ");
+
 }
